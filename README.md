@@ -12,4 +12,6 @@ The requirements of this project :
 At third commit ,you need to open the llama.cpp server on your work environment and then it can run the code<br />
 At this, we can commit a .wav on the input_wav , then use the code to create AI .wav on the output_wav
 
+python for flask and html can make a easy communication for AI
+
 
