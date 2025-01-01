@@ -1,0 +1,169 @@
+Python 3.12.6 (tags/v3.12.6:a4a2d2b, Sep  6 2024, 20:11:23) [MSC v.1940 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy as np
+>>> import pulp
+>>>
+>>> # 定义参数
+>>> num_years = 7  # 2024到2030年
+>>> num_fields = 5  # 假设有5块地
+>>> num_crops = 20  # 假设有20种作物
+>>> num_simulations = 1000  # 蒙特卡洛模拟次数
+>>>
+>>> # 从文件中提取的数据
+>>> crop_data = {
+...     '大麦': {'single': 10000, 'season1': None, 'season2': None},
+...     '包菜': {'single': None, 'season1': 4050, 'season2': None},
+...     '白灵菇': {'single': None, 'season1': None, 'season2': 18000},
+...     # ... 其他作物数据
+... }
+>>>
+>>> # 初始化作物的基本数据
+>>> E_initial = {crop: crop_data[crop]['single'] for crop in crop_data if crop_data[crop]['single'] is not None}
+>>> M_initial = {crop: 500  # 假设的亩产量初始值
+...               for crop in crop_data}
+>>> C_initial = {crop: 100  # 假设的种植成本初始值
+...               for crop in crop_data}
+>>> P_initial = {crop: 5    # 假设的销售价格初始值
+...               for crop in crop_data}
+>>>
+>>> # 变化率
+>>> r11 = 0.05  # 小麦、玉米的预期销售量变化率
+>>> r12 = 0.01  # 其他作物的预期销售量变化率
+>>> r2 = 0.0    # 亩产量变化率
+>>> r3 = 0.05   # 种植成本变化率
+>>> r41 = 0.05  # 蔬菜销售价格变化率
+>>> r42 = -0.05 # 食用菌销售价格变化率
+>>> r43 = -0.05 # 羊肚菌销售价格变化率
+>>>
+>>> # 替代性和互补性参数
+>>> gamma = {('大麦', '小麦'): 0.5, ('玉米', '高粱'): -0.3}  # 示例
+>>>
+>>> # 蒙特卡洛模拟
+>>> total_profits = []
+>>>
+>>> for _ in range(num_simulations):
+...     profits = []
+...     for t in range(2024, 2031):
+...         for i in range(1, num_fields + 1):
+...             for j, crop_j in enumerate(crop_data):
+...                 for h, crop_h in enumerate(crop_data):
+...                     if (crop_j, crop_h) in gamma:
+...                         x_j = pulp.LpVariable(f"x_{i}_{j}_{t}", lowBound=0, cat='Continuous')
+...                         x_h = pulp.LpVariable(f"x_{i}_{h}_{t}", lowBound=0, cat='Continuous')
+...                         problem += x_j + gamma[(crop_j, crop_h)] * x_h <= 1  # 假设地块面积为1
+...
+>>>                 if crop_data[crop_j]['single'] is not None:
+  File "<stdin>", line 1
+    if crop_data[crop_j]['single'] is not None:
+IndentationError: unexpected indent
+>>>                     # 随机生成变化率
+>>>                     if crop_j in ['小麦', '玉米']:
+  File "<stdin>", line 1
+    if crop_j in ['小麦', '玉米']:
+IndentationError: unexpected indent
+>>>                         r1 = np.random.uniform(r11 - 0.01, r11 + 0.01)
+  File "<stdin>", line 1
+    r1 = np.random.uniform(r11 - 0.01, r11 + 0.01)
+IndentationError: unexpected indent
+>>>                     else:
+  File "<stdin>", line 1
+    else:
+IndentationError: unexpected indent
+>>>                         r1 = np.random.uniform(r12 - 0.01, r12 + 0.01)
+  File "<stdin>", line 1
+    r1 = np.random.uniform(r12 - 0.01, r12 + 0.01)
+IndentationError: unexpected indent
+>>>
+>>>                     r2_sample = np.random.uniform(-0.1, 0.1)
+  File "<stdin>", line 1
+    r2_sample = np.random.uniform(-0.1, 0.1)
+IndentationError: unexpected indent
+>>>                     r3_sample = 0.05  # 固定值
+  File "<stdin>", line 1
+    r3_sample = 0.05  # 固定值
+IndentationError: unexpected indent
+>>>
+>>>                     # 计算预期销售量、亩产量、种植成本和销售价格
+>>>                     E = E_initial[crop_j] * (1 + r1) ** (t - 2023) if E_initial[crop_j] else 0
+  File "<stdin>", line 1
+    E = E_initial[crop_j] * (1 + r1) ** (t - 2023) if E_initial[crop_j] else 0
+IndentationError: unexpected indent
+>>>                     M = M_initial[crop_j] * (1 + r2_sample) ** (t - 2023)
+  File "<stdin>", line 1
+    M = M_initial[crop_j] * (1 + r2_sample) ** (t - 2023)
+IndentationError: unexpected indent
+>>>                     C = C_initial[crop_j] * (1 + r3_sample) ** (t - 2023)
+  File "<stdin>", line 1
+    C = C_initial[crop_j] * (1 + r3_sample) ** (t - 2023)
+IndentationError: unexpected indent
+>>>                     if crop_j in ['蔬菜']:
+  File "<stdin>", line 1
+    if crop_j in ['蔬菜']:
+IndentationError: unexpected indent
+>>>                         P = P_initial[crop_j] * (1 + r41) ** (t - 2023)
+  File "<stdin>", line 1
+    P = P_initial[crop_j] * (1 + r41) ** (t - 2023)
+IndentationError: unexpected indent
+>>>                     elif '食用菌' in crop_j:
+  File "<stdin>", line 1
+    elif '食用菌' in crop_j:
+IndentationError: unexpected indent
+>>>                         P = P_initial[crop_j] * (1 + r42) ** (t - 2023)
+  File "<stdin>", line 1
+    P = P_initial[crop_j] * (1 + r42) ** (t - 2023)
+IndentationError: unexpected indent
+>>>                     else:
+  File "<stdin>", line 1
+    else:
+IndentationError: unexpected indent
+>>>                         P = P_initial[crop_j] * (1 + r43) ** (t - 2023)
+  File "<stdin>", line 1
+    P = P_initial[crop_j] * (1 + r43) ** (t - 2023)
+IndentationError: unexpected indent
+>>>
+>>>                     # 目标函数部分
+>>>                     profit = pulp.lpSum([pulp.lpMin([x_j * M, E]) * P - x_j * C])
+  File "<stdin>", line 1
+    profit = pulp.lpSum([pulp.lpMin([x_j * M, E]) * P - x_j * C])
+IndentationError: unexpected indent
+>>>                     profits.append(profit)
+  File "<stdin>", line 1
+    profits.append(profit)
+IndentationError: unexpected indent
+>>>
+>>>     # 求解每个模拟的总利润
+>>>     problem = pulp.LpProblem("Crop_Optimization_Simulation", pulp.LpMaximize)
+  File "<stdin>", line 1
+    problem = pulp.LpProblem("Crop_Optimization_Simulation", pulp.LpMaximize)
+IndentationError: unexpected indent
+>>>     problem += pulp.lpSum(profits)
+  File "<stdin>", line 1
+    problem += pulp.lpSum(profits)
+IndentationError: unexpected indent
+>>>     problem.solve()
+  File "<stdin>", line 1
+    problem.solve()
+IndentationError: unexpected indent
+>>>     total_profits.append(pulp.value(problem.objective))
+  File "<stdin>", line 1
+    total_profits.append(pulp.value(problem.objective))
+IndentationError: unexpected indent
+>>>
+>>> # 计算最优解和平均利润
+>>> optimal_profit = max(total_profits)
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ValueError: max() iterable argument is empty
+>>> average_profit = np.mean(total_profits)
+C:\Users\思蓉\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\_core\fromnumeric.py:3904: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+C:\Users\思蓉\AppData\Local\Programs\Python\Python312\Lib\site-packages\numpy\_core\_methods.py:147: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+>>>
+>>> print(f"最优总利润: {optimal_profit}")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'optimal_profit' is not defined. Did you mean: 'total_profits'?
+>>> print(f"平均总利润: {average_profit}")
+平均总利润: nan
+>>>
